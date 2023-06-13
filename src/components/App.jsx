@@ -1,11 +1,14 @@
 // import Repeta from './Repeta/Repeta';
 import './App.scss';
-import Searchbar from './Searchbar/Searchbar';
-import ImageGallery from './ImageGallery/ImageGallery';
+
 import { PureComponent } from 'react';
 import handleSearchHits from './apiService/search_api.js';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Searchbar from './Searchbar/Searchbar';
+import ImageGallery from './ImageGallery/ImageGallery';
+import Loader from './Loader/Loader';
+import Button from './Button/Button';
 
 const toastStyle = {
   position: 'top-right',
@@ -19,41 +22,55 @@ const toastStyle = {
 };
 export default class App extends PureComponent {
   state = {
+    page: 1,
     searchRequest: '',
     searchHits: [],
+    isLoading: false,
+    isLoaded: false,
   };
 
   componentDidUpdate(_, prevState) {
-    if (prevState.searchRequest !== this.state.searchRequest) {
-      handleSearchHits(this.state.searchRequest)
+    const { searchRequest, page } = this.state;
+
+    if (prevState.searchRequest !== searchRequest || prevState.page !== page) {
+      this.setState({ isLoading: true });
+      handleSearchHits(searchRequest, page)
         .then(request => {
-          console.log(request.data.hits);
           if (request.data.hits.length === 0) {
             toast.error('Didn`t find anything on this request', toastStyle);
           }
-          this.setState({ searchHits: [...request.data.hits] });
+          this.setState(prevState => ({
+            searchHits: [...prevState.searchHits, ...request.data.hits],
+          }));
           setTimeout(
             () => console.log('searchHits: ', this.state.searchHits),
             0
           );
         })
-        .catch(error => toast.error(error.message, toastStyle));
+        .catch(error => toast.error(error.message, toastStyle))
+        .finally(() => this.setState({ isLoading: false, isLoaded: true }));
     }
   }
   // *********************************************
   handleArivedData = searchRequest => {
-    console.log('Conrtol change:', searchRequest);
-    this.setState({ searchRequest });
+    this.setState({ page: 1, searchRequest, searchHits: [], isLoaded: false });
   };
   // *********************************************
+  handleLoadMoreData = searchRequest => {
+    this.setState({ page: this.state.page + 1 });
+  };
 
   render() {
+    const { searchHits, isLoading, isLoaded } = this.state;
     return (
       <div className="App">
         <Searchbar onSubmit={this.handleArivedData} />
         <ToastContainer />
-        <ImageGallery picturesArr={this.state.searchHits} />
-        {/* <Repeta /> */}
+
+        {isLoading ? <Loader /> : <ImageGallery picturesArr={searchHits} />}
+        {isLoaded && (
+          <Button onConfirm={this.handleLoadMoreData}>Load more</Button>
+        )}
       </div>
     );
   }
