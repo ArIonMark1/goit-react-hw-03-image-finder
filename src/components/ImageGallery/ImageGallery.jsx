@@ -4,6 +4,7 @@ import './ImageGallery.scss';
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 
 const ImageGallery = ({ picturesArr }) => {
+  console.log(picturesArr);
   return (
     <ul className="ImageGallery">
       {picturesArr &&
@@ -21,13 +22,6 @@ const ImageGallery = ({ picturesArr }) => {
 
 export default ImageGallery;
 
-// ImageGallery.propTypes = {
-//   picturesArr: PropTypes.arrayOf(
-//     PropTypes.exact({
-//       id: PropTypes.number.isRequired,
-//       largeImageURL: PropTypes.string.isRequired,
-//       webformatURL: PropTypes.string.isRequired,
-//       tags: PropTypes.string,
-//     })
-//   ),
-// };
+ImageGallery.propTypes = {
+  picturesArr: PropTypes.array.isRequired,
+};
