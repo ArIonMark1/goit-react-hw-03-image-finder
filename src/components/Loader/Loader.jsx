@@ -1,4 +1,4 @@
-import { ClipLoader, CircleLoader } from 'react-spinners';
+import { CircleLoader } from 'react-spinners';
 import ImageGallery from 'components/ImageGallery/ImageGallery';
 import './Loader.scss';
 import plug_image from './searching.png';
@@ -7,7 +7,7 @@ export default function Loader() {
   const skeleton = {
     id: 0,
     largeImageURL: '',
-    webformatURL: '',
+    webformatURL: plug_image,
     tags: '',
   };
   return (
