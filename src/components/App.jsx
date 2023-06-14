@@ -1,8 +1,8 @@
-// import Repeta from './Repeta/Repeta';
 import './App.scss';
-
+import debounce from 'lodash.debounce';
 import { PureComponent } from 'react';
 import handleSearchHits from './apiService/search_api.js';
+import controlPosition from './apiService/controlPosition';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from './Searchbar/Searchbar';
@@ -23,52 +23,85 @@ const toastStyle = {
 export default class App extends PureComponent {
   state = {
     page: 1,
+    per_page: 12,
     searchRequest: '',
     searchHits: [],
     isLoading: false,
-    isLoaded: false,
+    isButton: false,
   };
+  componentDidMount() {
+    const searchButton = document.getElementById('LoadMoreButton');
+    if (searchButton) {
+      searchButton.scrollIntoView();
+    }
+  }
 
   componentDidUpdate(_, prevState) {
-    const { searchRequest, page } = this.state;
+    const { searchRequest, page, per_page } = this.state;
 
     if (prevState.searchRequest !== searchRequest || prevState.page !== page) {
-      this.setState({ isLoading: true });
-      handleSearchHits(searchRequest, page)
+      // this.setState({ isButton: false });
+      // ++++++++++++++++++++++++++++++++++
+      handleSearchHits(searchRequest, page, per_page)
         .then(request => {
-          if (request.data.hits.length === 0) {
-            toast.error('Didn`t find anything on this request', toastStyle);
+          if (request.total === 0) {
+            return toast.error(
+              'Didn`t find anything on this request',
+              toastStyle
+            );
           }
+          if (request.total > per_page) {
+            this.setState({ isButton: true });
+            const searchButton = document.getElementById('LoadMoreButton');
+            if (searchButton) {
+              searchButton.scrollIntoView({
+                block: 'center',
+                behavior: 'smooth',
+              }); //  ????????????????????????
+            }
+          }
+
           this.setState(prevState => ({
-            searchHits: [...prevState.searchHits, ...request.data.hits],
+            searchHits: [...prevState.searchHits, ...request.hits],
           }));
+
+          console.log(request);
           setTimeout(
             () => console.log('searchHits: ', this.state.searchHits),
             0
           );
         })
         .catch(error => toast.error(error.message, toastStyle))
-        .finally(() => this.setState({ isLoading: false, isLoaded: true }));
+        .finally(() => this.setState({ isLoading: false }));
     }
   }
+
   // *********************************************
-  handleArivedData = searchRequest => {
-    this.setState({ page: 1, searchRequest, searchHits: [], isLoaded: false });
+  handleConfirnRequest = searchRequest => {
+    this.setState({
+      page: 1,
+      searchRequest,
+      searchHits: [],
+      isLoading: true,
+      isButton: false,
+    });
   };
   // *********************************************
-  handleLoadMoreData = searchRequest => {
+  handleLoadMoreData = () => {
     this.setState({ page: this.state.page + 1 });
+    debounce(controlPosition, 500);
   };
 
   render() {
-    const { searchHits, isLoading, isLoaded } = this.state;
+    controlPosition();
+    const { searchHits, isLoading, isButton } = this.state;
     return (
       <div className="App">
-        <Searchbar onSubmit={this.handleArivedData} />
+        <Searchbar onSubmit={this.handleConfirnRequest} />
         <ToastContainer />
 
         {isLoading ? <Loader /> : <ImageGallery picturesArr={searchHits} />}
-        {isLoaded && (
+        {isButton && (
           <Button onConfirm={this.handleLoadMoreData}>Load more</Button>
         )}
       </div>

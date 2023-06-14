@@ -5,7 +5,12 @@ export default class Button extends PureComponent {
   render() {
     const { onConfirm, children } = this.props;
     return (
-      <button type="button" className="Button" onClick={onConfirm}>
+      <button
+        id="LoadMoreButton"
+        type="button"
+        className="Button"
+        onClick={onConfirm}
+      >
         {children}
       </button>
     );
