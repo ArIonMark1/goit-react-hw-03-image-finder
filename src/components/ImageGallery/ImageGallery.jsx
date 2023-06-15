@@ -4,9 +4,9 @@ import './ImageGallery.scss';
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 
 const ImageGallery = ({ picturesArr }) => {
-  console.log(picturesArr);
+  // console.log(picturesArr);
   return (
-    <ul className="ImageGallery">
+    <ul id="gallery" className="ImageGallery">
       {picturesArr &&
         picturesArr.map(picture => (
           <ImageGalleryItem

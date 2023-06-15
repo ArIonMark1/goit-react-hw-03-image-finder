@@ -40,7 +40,6 @@ export default class App extends PureComponent {
     const { searchRequest, page, per_page } = this.state;
 
     if (prevState.searchRequest !== searchRequest || prevState.page !== page) {
-      // this.setState({ isButton: false });
       // ++++++++++++++++++++++++++++++++++
       handleSearchHits(searchRequest, page, per_page)
         .then(request => {
@@ -54,10 +53,13 @@ export default class App extends PureComponent {
             this.setState({ isButton: true });
             const searchButton = document.getElementById('LoadMoreButton');
             if (searchButton) {
-              searchButton.scrollIntoView({
-                block: 'center',
-                behavior: 'smooth',
-              }); //  ????????????????????????
+              setTimeout(
+                searchButton.scrollIntoView({
+                  block: 'center',
+                  behavior: 'smooth',
+                }),
+                500
+              ); //  ????????????????????????
             }
           }
 
@@ -65,7 +67,7 @@ export default class App extends PureComponent {
             searchHits: [...prevState.searchHits, ...request.hits],
           }));
 
-          console.log(request);
+          // console.log(request);
           setTimeout(
             () => console.log('searchHits: ', this.state.searchHits),
             0
@@ -87,9 +89,12 @@ export default class App extends PureComponent {
     });
   };
   // *********************************************
-  handleLoadMoreData = () => {
+  handleLoadMoreData = evt => {
     this.setState({ page: this.state.page + 1 });
-    debounce(controlPosition, 500);
+
+    setTimeout(() => {
+      controlPosition();
+    }, 400);
   };
 
   render() {
