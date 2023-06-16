@@ -1,5 +1,4 @@
 import './App.scss';
-import debounce from 'lodash.debounce';
 import { PureComponent } from 'react';
 import handleSearchHits from './apiService/search_api.js';
 import controlPosition from './apiService/controlPosition';
@@ -51,27 +50,11 @@ export default class App extends PureComponent {
           }
           if (request.total > per_page) {
             this.setState({ isButton: true });
-            const searchButton = document.getElementById('LoadMoreButton');
-            if (searchButton) {
-              setTimeout(
-                searchButton.scrollIntoView({
-                  block: 'center',
-                  behavior: 'smooth',
-                }),
-                500
-              ); //  ????????????????????????
-            }
+            // const searchButton = document.getElementById('LoadMoreButton');
           }
-
           this.setState(prevState => ({
             searchHits: [...prevState.searchHits, ...request.hits],
           }));
-
-          // console.log(request);
-          setTimeout(
-            () => console.log('searchHits: ', this.state.searchHits),
-            0
-          );
         })
         .catch(error => toast.error(error.message, toastStyle))
         .finally(() => this.setState({ isLoading: false }));
@@ -80,6 +63,7 @@ export default class App extends PureComponent {
 
   // *********************************************
   handleConfirnRequest = searchRequest => {
+    // receaving data for searching and state updating
     this.setState({
       page: 1,
       searchRequest,
@@ -90,11 +74,12 @@ export default class App extends PureComponent {
   };
   // *********************************************
   handleLoadMoreData = evt => {
+    //  changing page and auto scrolling to button
     this.setState({ page: this.state.page + 1 });
 
     setTimeout(() => {
       controlPosition();
-    }, 400);
+    }, 200);
   };
 
   render() {

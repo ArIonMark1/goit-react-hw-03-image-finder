@@ -4,8 +4,7 @@ export default function controlPosition() {
   if (!gallery) {
     return;
   }
-  const galleryParams = gallery.getBoundingClientRect();
-  console.log('Params of Gallery: ', galleryParams);
+  const galleryParams = gallery.getBoundingClientRect(); // returns a object, providing info about the size and position of element
 
   window.scrollTo(0, galleryParams.height);
 }
