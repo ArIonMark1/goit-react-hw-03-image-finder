@@ -50,7 +50,6 @@ export default class App extends PureComponent {
           }
           if (request.total > per_page) {
             this.setState({ isButton: true });
-            // const searchButton = document.getElementById('LoadMoreButton');
           }
           this.setState(prevState => ({
             searchHits: [...prevState.searchHits, ...request.hits],
