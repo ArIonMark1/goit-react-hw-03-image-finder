@@ -82,7 +82,6 @@ export default class App extends PureComponent {
   };
 
   render() {
-    controlPosition();
     const { searchHits, isLoading, isButton } = this.state;
     return (
       <div className="App">
